@@ -4,20 +4,19 @@ import { IUser } from './IUser';
 import { v4 as uuidv4 } from 'uuid';
 import { validate as isValidUUID } from 'uuid';
 import { UpdatePasswordDto } from './dto/update-user.dto';
+import { db } from 'src/db';
 
 @Injectable()
 export class UsersService {
-  private users = [];
-
-  async getAll() {
-    return this.users;
+  getAll() {
+    return db.users;
   }
 
   getById(id: string) {
     if (!isValidUUID(id)) {
       throw new HttpException(`Id ${id} not valid`, HttpStatus.BAD_REQUEST);
     }
-    const user = this.users.find((user: IUser) => user.id === id);
+    const user = db.users.find((user: IUser) => user.id === id);
     if (!user) {
       throw new HttpException(`User ${id} not found`, HttpStatus.NOT_FOUND);
     } else {
@@ -33,7 +32,7 @@ export class UsersService {
       createdAt: Date.now(),
       updatedAt: Date.now(),
     };
-    this.users.push(user);
+    db.users.push(user);
     //const { password, ...updatedUser } = user;
     //return updatedUser;
     return user;
@@ -44,7 +43,7 @@ export class UsersService {
       throw new HttpException(`Id ${id} not valid`, HttpStatus.BAD_REQUEST);
     }
 
-    const user: IUser = this.users.find((user: IUser) => user.id === id);
+    const user: IUser = db.users.find((user: IUser) => user.id === id);
     if (!user) {
       throw new HttpException(`User ${id} not found`, HttpStatus.NOT_FOUND);
     }
@@ -56,9 +55,9 @@ export class UsersService {
       );
     }
 
-    const userIndex = this.users.findIndex((user) => user.id === id);
+    const userIndex = db.users.findIndex((user) => user.id === id);
 
-    this.users[userIndex] = {
+    db.users[userIndex] = {
       ...user,
       version: ++user.version,
       updatedAt: Date.now(),
@@ -66,18 +65,18 @@ export class UsersService {
     };
 
     //const { password, ...updatedUser } = this.users[userIndex];
-    return this.users[userIndex];
+    return db.users[userIndex];
   }
 
   deleteUser(id: string) {
     if (!isValidUUID(id)) {
       throw new HttpException(`Id ${id} not valid`, HttpStatus.BAD_REQUEST);
     }
-    const userIndex = this.users.findIndex((user) => user.id === id);
+    const userIndex = db.users.findIndex((user) => user.id === id);
     if (userIndex === -1) {
       throw new HttpException(`User ${id} not found`, HttpStatus.NOT_FOUND);
     }
-    const deletedUser = this.users.splice(userIndex, 1);
+    const deletedUser = db.users.splice(userIndex, 1);
 
     return deletedUser;
   }

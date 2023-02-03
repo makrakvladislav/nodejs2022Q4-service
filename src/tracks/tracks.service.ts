@@ -1,4 +1,5 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { db } from 'src/db';
 import { v4 as uuidv4 } from 'uuid';
 import { validate as isValidUUID } from 'uuid';
 import { CreateTrackDto } from './dto/create-track.dto';
@@ -6,17 +7,15 @@ import { ITrack } from './ITrack';
 
 @Injectable()
 export class TracksService {
-  private tracks: Array<ITrack> = [];
-
   getAll() {
-    return this.tracks;
+    return db.tracks;
   }
 
   getById(id: string) {
     if (!isValidUUID(id)) {
       throw new HttpException(`Id ${id} not valid`, HttpStatus.BAD_REQUEST);
     }
-    const track = this.tracks.find((track: ITrack) => track.id === id);
+    const track = db.tracks.find((track: ITrack) => track.id === id);
     if (!track) {
       throw new HttpException(`track ${id} not found`, HttpStatus.NOT_FOUND);
     } else {
@@ -29,7 +28,7 @@ export class TracksService {
       id: uuidv4(),
       ...trackDto,
     };
-    this.tracks.push(track);
+    db.tracks.push(track);
     return track;
   }
 
@@ -38,29 +37,29 @@ export class TracksService {
       throw new HttpException(`Id ${id} not valid`, HttpStatus.BAD_REQUEST);
     }
 
-    const track: ITrack = this.tracks.find((track: ITrack) => track.id === id);
+    const track: ITrack = db.tracks.find((track: ITrack) => track.id === id);
     if (!track) {
       throw new HttpException(`Track ${id} not found`, HttpStatus.NOT_FOUND);
     }
 
-    const trackIndex = this.tracks.findIndex((track) => track.id === id);
-    this.tracks[trackIndex] = {
+    const trackIndex = db.tracks.findIndex((track) => track.id === id);
+    db.tracks[trackIndex] = {
       id: track.id,
       ...trackDto,
     };
 
-    return this.tracks[trackIndex];
+    return db.tracks[trackIndex];
   }
 
   deleteTrack(id: string) {
     if (!isValidUUID(id)) {
       throw new HttpException(`Id ${id} not valid`, HttpStatus.BAD_REQUEST);
     }
-    const trackIndex = this.tracks.findIndex((user) => user.id === id);
+    const trackIndex = db.tracks.findIndex((user) => user.id === id);
     if (trackIndex === -1) {
       throw new HttpException(`Track ${id} not found`, HttpStatus.NOT_FOUND);
     }
-    const deletedTrack = this.tracks.splice(trackIndex, 1);
+    const deletedTrack = db.tracks.splice(trackIndex, 1);
 
     return deletedTrack;
   }
