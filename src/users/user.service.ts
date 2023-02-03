@@ -14,12 +14,10 @@ export class UsersService {
   }
 
   getById(id: string) {
-    console.log(id);
     if (!isValidUUID(id)) {
       throw new HttpException(`Id ${id} not valid`, HttpStatus.BAD_REQUEST);
     }
     const user = this.users.find((user: IUser) => user.id === id);
-    console.log(user);
     if (!user) {
       throw new HttpException(`User ${id} not found`, HttpStatus.NOT_FOUND);
     } else {
@@ -30,13 +28,14 @@ export class UsersService {
   createUser(userDto: CreateUserDto) {
     const user = {
       id: uuidv4(),
+      ...userDto,
       version: 1,
       createdAt: Date.now(),
       updatedAt: Date.now(),
-      ...userDto,
     };
     this.users.push(user);
-    console.log(this.users);
+    //const { password, ...updatedUser } = user;
+    //return updatedUser;
     return user;
   }
 
@@ -65,6 +64,8 @@ export class UsersService {
       updatedAt: Date.now(),
       password: userDto.newPassword.toString(),
     };
+
+    //const { password, ...updatedUser } = this.users[userIndex];
     return this.users[userIndex];
   }
 
@@ -77,6 +78,7 @@ export class UsersService {
       throw new HttpException(`User ${id} not found`, HttpStatus.NOT_FOUND);
     }
     const deletedUser = this.users.splice(userIndex, 1);
+
     return deletedUser;
   }
 }
