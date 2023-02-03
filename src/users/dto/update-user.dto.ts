@@ -1,4 +1,15 @@
+import { IsString, MinLength } from 'class-validator';
+
 export class UpdatePasswordDto {
-  readonly oldPassword: string;
-  readonly newPassword: string;
+  @IsString()
+  @MinLength(3, {
+    message: 'Password is too short',
+  })
+  oldPassword: string;
+
+  @IsString()
+  @MinLength(3, {
+    message: 'Password is too short',
+  })
+  newPassword: string;
 }
