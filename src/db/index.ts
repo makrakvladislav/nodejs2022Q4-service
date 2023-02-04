@@ -5,4 +5,9 @@ export const db: IDb = {
   artists: [],
   tracks: [],
   albums: [],
+  favorites: {
+    albums: [],
+    artists: [],
+    tracks: [],
+  },
 };
