@@ -17,7 +17,7 @@ export class TracksService {
     }
     const track = db.tracks.find((track: ITrack) => track.id === id);
     if (!track) {
-      throw new HttpException(`track ${id} not found`, HttpStatus.NOT_FOUND);
+      throw new HttpException(`Track ${id} not found`, HttpStatus.NOT_FOUND);
     } else {
       return track;
     }
@@ -28,6 +28,7 @@ export class TracksService {
       id: uuidv4(),
       ...trackDto,
     };
+
     db.tracks.push(track);
     return track;
   }
@@ -55,10 +56,13 @@ export class TracksService {
     if (!isValidUUID(id)) {
       throw new HttpException(`Id ${id} not valid`, HttpStatus.BAD_REQUEST);
     }
+
     const trackIndex = db.tracks.findIndex((user) => user.id === id);
     if (trackIndex === -1) {
       throw new HttpException(`Track ${id} not found`, HttpStatus.NOT_FOUND);
     }
+
+    db.favorites.tracks = db.favorites.tracks.filter((track) => track !== id);
     const deletedTrack = db.tracks.splice(trackIndex, 1);
 
     return deletedTrack;

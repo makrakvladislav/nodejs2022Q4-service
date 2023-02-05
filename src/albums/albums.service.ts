@@ -29,6 +29,7 @@ export class AlbumsService {
       id: uuidv4(),
       ...albumDto,
     };
+
     db.albums.push(album);
     return album;
   }
@@ -73,10 +74,10 @@ export class AlbumsService {
         ...albumTrack,
         albumId: null,
       };
+      db.favorites.albums = db.favorites.albums.filter((album) => album !== id);
     }
 
     const deletedAlbum = db.albums.splice(albumIndex, 1);
-
     return deletedAlbum;
   }
 }
