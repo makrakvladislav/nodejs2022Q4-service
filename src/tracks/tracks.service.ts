@@ -3,7 +3,6 @@ import { db } from 'src/db';
 import { v4 as uuidv4 } from 'uuid';
 import { validate as isValidUUID } from 'uuid';
 import { CreateTrackDto } from './dto/create-track.dto';
-import { ITrack } from './ITrack';
 
 @Injectable()
 export class TracksService {
@@ -15,7 +14,7 @@ export class TracksService {
     if (!isValidUUID(id)) {
       throw new HttpException(`Id ${id} not valid`, HttpStatus.BAD_REQUEST);
     }
-    const track = db.tracks.find((track: ITrack) => track.id === id);
+    const track = db.tracks.find((track) => track.id === id);
     if (!track) {
       throw new HttpException(`Track ${id} not found`, HttpStatus.NOT_FOUND);
     } else {
@@ -38,7 +37,7 @@ export class TracksService {
       throw new HttpException(`Id ${id} not valid`, HttpStatus.BAD_REQUEST);
     }
 
-    const track: ITrack = db.tracks.find((track: ITrack) => track.id === id);
+    const track = db.tracks.find((track) => track.id === id);
     if (!track) {
       throw new HttpException(`Track ${id} not found`, HttpStatus.NOT_FOUND);
     }

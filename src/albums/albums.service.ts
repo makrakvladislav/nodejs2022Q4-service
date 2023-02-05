@@ -1,10 +1,9 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { db } from 'src/db';
-import { ITrack } from 'src/tracks/ITrack';
+import { ITrack } from 'src/interfaces/ITrack';
 import { v4 as uuidv4 } from 'uuid';
 import { validate as isValidUUID } from 'uuid';
 import { CreateAlbumDto } from './dto/create-album.dto';
-import { IAlbum } from './IAlbum';
 
 @Injectable()
 export class AlbumsService {
@@ -16,7 +15,7 @@ export class AlbumsService {
     if (!isValidUUID(id)) {
       throw new HttpException(`Id ${id} not valid`, HttpStatus.BAD_REQUEST);
     }
-    const album = db.albums.find((album: IAlbum) => album.id === id);
+    const album = db.albums.find((album) => album.id === id);
     if (!album) {
       throw new HttpException(`Album ${id} not found`, HttpStatus.NOT_FOUND);
     } else {
@@ -39,7 +38,7 @@ export class AlbumsService {
       throw new HttpException(`Id ${id} not valid`, HttpStatus.BAD_REQUEST);
     }
 
-    const album: IAlbum = db.albums.find((album: IAlbum) => album.id === id);
+    const album = db.albums.find((album) => album.id === id);
     if (!album) {
       throw new HttpException(`Album ${id} not found`, HttpStatus.NOT_FOUND);
     }

@@ -1,6 +1,5 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
-import { IUser } from './IUser';
 import { v4 as uuidv4 } from 'uuid';
 import { validate as isValidUUID } from 'uuid';
 import { UpdatePasswordDto } from './dto/update-user.dto';
@@ -16,7 +15,7 @@ export class UsersService {
     if (!isValidUUID(id)) {
       throw new HttpException(`Id ${id} not valid`, HttpStatus.BAD_REQUEST);
     }
-    const user = db.users.find((user: IUser) => user.id === id);
+    const user = db.users.find((user) => user.id === id);
     if (!user) {
       throw new HttpException(`User ${id} not found`, HttpStatus.NOT_FOUND);
     } else {
@@ -43,7 +42,7 @@ export class UsersService {
       throw new HttpException(`Id ${id} not valid`, HttpStatus.BAD_REQUEST);
     }
 
-    const user: IUser = db.users.find((user: IUser) => user.id === id);
+    const user = db.users.find((user) => user.id === id);
     if (!user) {
       throw new HttpException(`User ${id} not found`, HttpStatus.NOT_FOUND);
     }

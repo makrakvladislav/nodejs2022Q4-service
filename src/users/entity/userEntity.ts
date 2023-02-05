@@ -1,5 +1,5 @@
 import { Exclude } from 'class-transformer';
-import { IUser } from '../IUser';
+import { IUser } from '../../interfaces/IUser';
 
 export class UserEntity {
   @Exclude()

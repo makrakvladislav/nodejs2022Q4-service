@@ -3,7 +3,6 @@ import { db } from 'src/db';
 import { v4 as uuidv4 } from 'uuid';
 import { validate as isValidUUID } from 'uuid';
 import { CreateArtistDto } from './dto/create-artist.dto';
-import { IArtist } from './IArtist';
 
 @Injectable()
 export class ArtistsService {
@@ -15,7 +14,7 @@ export class ArtistsService {
     if (!isValidUUID(id)) {
       throw new HttpException(`Id ${id} not valid`, HttpStatus.BAD_REQUEST);
     }
-    const artist = db.artists.find((artist: IArtist) => artist.id === id);
+    const artist = db.artists.find((artist) => artist.id === id);
     if (!artist) {
       throw new HttpException(`artist ${id} not found`, HttpStatus.NOT_FOUND);
     } else {
@@ -38,9 +37,7 @@ export class ArtistsService {
       throw new HttpException(`Id ${id} not valid`, HttpStatus.BAD_REQUEST);
     }
 
-    const artist: IArtist = db.artists.find(
-      (artist: IArtist) => artist.id === id,
-    );
+    const artist = db.artists.find((artist) => artist.id === id);
     if (!artist) {
       throw new HttpException(`Artist ${id} not found`, HttpStatus.NOT_FOUND);
     }

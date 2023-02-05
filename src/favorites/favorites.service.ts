@@ -2,11 +2,9 @@ import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { Inject } from '@nestjs/common/decorators';
 import { forwardRef } from '@nestjs/common/utils';
 import { AlbumsService } from 'src/albums/albums.service';
-import { IAlbum } from 'src/albums/IAlbum';
+import { IAlbum } from 'src/interfaces/IAlbum';
 import { ArtistsService } from 'src/artists/artists.service';
-import { IArtist } from 'src/artists/IArtist';
 import { db } from 'src/db';
-import { ITrack } from 'src/tracks/ITrack';
 import { TracksService } from 'src/tracks/tracks.service';
 import { validate as isValidUUID } from 'uuid';
 
@@ -43,7 +41,7 @@ export class FavoritesService {
     if (!isValidUUID(id)) {
       throw new HttpException(`Id ${id} not valid`, HttpStatus.BAD_REQUEST);
     }
-    const track: ITrack = db.tracks.find((track: ITrack) => track.id === id);
+    const track = db.tracks.find((track) => track.id === id);
     if (!track) {
       throw new HttpException(
         `Track ${id} not found`,
@@ -59,9 +57,7 @@ export class FavoritesService {
     if (!isValidUUID(id)) {
       throw new HttpException(`Id ${id} not valid`, HttpStatus.BAD_REQUEST);
     }
-    const artist: IArtist = db.artists.find(
-      (artist: IArtist) => artist.id === id,
-    );
+    const artist = db.artists.find((artist) => artist.id === id);
     if (!artist) {
       throw new HttpException(
         `Artist ${id} not found`,

@@ -1,4 +1,4 @@
-import { IDb } from './IDb';
+import { IDb } from '../interfaces/IDb';
 
 export const db: IDb = {
   users: [],
