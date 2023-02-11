@@ -1,0 +1,14 @@
+version: '3.8'
+
+services:
+  home-library-api:
+    image: 'home-library'
+    build: .
+    ports:
+      - '${PORT}:${PORT}'
+    env_file: .env
+    environment:
+      PORT: '${PORT}'
+    volumes:
+      - ./src:/app/src
+    restart: on-failure
