@@ -7,10 +7,12 @@ services:
     ports:
       - ${PORT}:${PORT}
     env_file: .env
+    depends_on:
+      - db
     environment:
-      PORT: ${PORT}
+      - POSTGRES_HOST=db
     volumes:
-      - ./:/app
+      - ./src:/app/src
     restart: on-failure
     networks:
       - home-library-bridge
@@ -18,9 +20,10 @@ services:
   db:
     image: makrakvladislav/postgres-db:db
     build: ./db
+    ports:
+      - '$POSTGRES_PORT:$POSTGRES_PORT'
     env_file: .env
     environment:
-      POSTGRES_PORT: ${PORT}
       POSTGRES_DB: ${POSTGRES_DB}
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
@@ -32,7 +35,6 @@ services:
 
 networks:
   home-library-bridge:
-    name: library-bridge
     driver: bridge
 
 volumes:
