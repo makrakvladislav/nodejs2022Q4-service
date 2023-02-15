@@ -12,7 +12,7 @@ services:
     environment:
       - POSTGRES_HOST=db
     volumes:
-      - ./src:/app/src
+      - ./src:/usr/app/src
     restart: on-failure
     networks:
       - home-library-bridge
@@ -29,7 +29,7 @@ services:
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     restart: on-failure
     volumes:
-      - ./db/data:/var/lib/postgresql/data
+      - db:/var/lib/postgresql/data
     networks:
       - home-library-bridge
 
