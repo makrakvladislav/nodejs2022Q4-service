@@ -14,7 +14,6 @@ import {
 } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdatePasswordDto } from './dto/update-user.dto';
-import { UserEntity } from './entity/userEntity';
 import { UsersService } from './users.service';
 
 @UseInterceptors(ClassSerializerInterceptor)
@@ -34,17 +33,17 @@ export class UsersController {
 
   @Post()
   @UsePipes(ValidationPipe)
-  createUser(@Body() CreateUserDto: CreateUserDto) {
-    return new UserEntity(this.UsersService.createUser(CreateUserDto));
+  async createUser(@Body() CreateUserDto: CreateUserDto) {
+    return await this.UsersService.createUser(CreateUserDto);
   }
 
   @Put(':id')
   @UsePipes(ValidationPipe)
-  updateUser(
+  async updateUser(
     @Body() UpdatePasswordDto: UpdatePasswordDto,
     @Param('id') id: string,
   ) {
-    return new UserEntity(this.UsersService.updateUser(UpdatePasswordDto, id));
+    return await this.UsersService.updateUser(UpdatePasswordDto, id);
   }
 
   @Delete(':id')

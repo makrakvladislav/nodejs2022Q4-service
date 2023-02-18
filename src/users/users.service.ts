@@ -1,21 +1,28 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
-import { v4 as uuidv4 } from 'uuid';
 import { validate as isValidUUID } from 'uuid';
 import { UpdatePasswordDto } from './dto/update-user.dto';
-import { db } from 'src/db';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { UserEntity } from './entity/user.entity';
 
 @Injectable()
 export class UsersService {
-  getAll() {
-    return db.users;
+  constructor(
+    @InjectRepository(UserEntity)
+    private userRepository: Repository<UserEntity>,
+  ) {}
+
+  async getAll() {
+    const users = await this.userRepository.find();
+    return users.map((user) => user.toResponse());
   }
 
-  getById(id: string) {
+  async getById(id: string) {
     if (!isValidUUID(id)) {
       throw new HttpException(`Id ${id} not valid`, HttpStatus.BAD_REQUEST);
     }
-    const user = db.users.find((user) => user.id === id);
+    const user = await this.userRepository.findOneBy({ id });
     if (!user) {
       throw new HttpException(`User ${id} not found`, HttpStatus.NOT_FOUND);
     } else {
@@ -23,26 +30,23 @@ export class UsersService {
     }
   }
 
-  createUser(userDto: CreateUserDto) {
+  async createUser(userDto: CreateUserDto) {
     const user = {
-      id: uuidv4(),
       ...userDto,
       version: 1,
       createdAt: Date.now(),
       updatedAt: Date.now(),
     };
-    db.users.push(user);
-    //const { password, ...updatedUser } = user;
-    //return updatedUser;
-    return user;
+    const createUser = await this.userRepository.create(user);
+    return await (await this.userRepository.save(createUser)).toResponse();
   }
 
-  updateUser(userDto: UpdatePasswordDto, id: string) {
+  async updateUser(userDto: UpdatePasswordDto, id: string) {
     if (!isValidUUID(id)) {
       throw new HttpException(`Id ${id} not valid`, HttpStatus.BAD_REQUEST);
     }
 
-    const user = db.users.find((user) => user.id === id);
+    const user = await this.userRepository.findOneBy({ id });
     if (!user) {
       throw new HttpException(`User ${id} not found`, HttpStatus.NOT_FOUND);
     }
@@ -54,29 +58,32 @@ export class UsersService {
       );
     }
 
-    const userIndex = db.users.findIndex((user) => user.id === id);
-
-    db.users[userIndex] = {
-      ...user,
+    await this.userRepository.update(id, {
+      password: userDto.newPassword.toString(),
       version: ++user.version,
       updatedAt: Date.now(),
-      password: userDto.newPassword.toString(),
-    };
+    });
 
-    //const { password, ...updatedUser } = this.users[userIndex];
-    return db.users[userIndex];
+    const updatedUser = await this.userRepository.findOneBy({ id });
+
+    return {
+      id: updatedUser.id,
+      login: updatedUser.login,
+      version: updatedUser.version,
+      createdAt: Number(updatedUser.createdAt),
+      updatedAt: Number(updatedUser.updatedAt),
+    };
   }
 
-  deleteUser(id: string) {
+  async deleteUser(id: string) {
     if (!isValidUUID(id)) {
       throw new HttpException(`Id ${id} not valid`, HttpStatus.BAD_REQUEST);
     }
-    const userIndex = db.users.findIndex((user) => user.id === id);
-    if (userIndex === -1) {
+    const user = await this.userRepository.findOneBy({ id });
+    if (!user) {
       throw new HttpException(`User ${id} not found`, HttpStatus.NOT_FOUND);
     }
-    const deletedUser = db.users.splice(userIndex, 1);
 
-    return deletedUser;
+    return await this.userRepository.delete({ id });
   }
 }
