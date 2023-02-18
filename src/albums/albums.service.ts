@@ -1,21 +1,26 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
-import { db } from 'src/db';
-import { ITrack } from 'src/interfaces/ITrack';
-import { v4 as uuidv4 } from 'uuid';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
 import { validate as isValidUUID } from 'uuid';
 import { CreateAlbumDto } from './dto/create-album.dto';
+import { AlbumEntity } from './entity/albums.entity';
 
 @Injectable()
 export class AlbumsService {
-  getAll() {
-    return db.albums;
+  constructor(
+    @InjectRepository(AlbumEntity)
+    private albumRepository: Repository<AlbumEntity>,
+  ) {}
+
+  async getAll() {
+    return await this.albumRepository.find();
   }
 
-  getById(id: string) {
+  async getById(id: string) {
     if (!isValidUUID(id)) {
       throw new HttpException(`Id ${id} not valid`, HttpStatus.BAD_REQUEST);
     }
-    const album = db.albums.find((album) => album.id === id);
+    const album = await this.albumRepository.findOneBy({ id });
     if (!album) {
       throw new HttpException(`Album ${id} not found`, HttpStatus.NOT_FOUND);
     } else {
@@ -23,44 +28,43 @@ export class AlbumsService {
     }
   }
 
-  createAlbum(albumDto: CreateAlbumDto) {
+  async createAlbum(albumDto: CreateAlbumDto) {
     const album = {
-      id: uuidv4(),
       ...albumDto,
     };
 
-    db.albums.push(album);
-    return album;
+    const createAlbum = await this.albumRepository.create(album);
+    return await this.albumRepository.save(createAlbum);
   }
 
-  updateAlbum(albumDto: CreateAlbumDto, id: string) {
+  async updateAlbum(albumDto: CreateAlbumDto, id: string) {
     if (!isValidUUID(id)) {
       throw new HttpException(`Id ${id} not valid`, HttpStatus.BAD_REQUEST);
     }
 
-    const album = db.albums.find((album) => album.id === id);
+    const album = await this.albumRepository.findOneBy({ id });
     if (!album) {
       throw new HttpException(`Album ${id} not found`, HttpStatus.NOT_FOUND);
     }
 
-    const albumIndex = db.albums.findIndex((album) => album.id === id);
-    db.albums[albumIndex] = {
+    await this.albumRepository.update(id, {
       id: album.id,
       ...albumDto,
-    };
+    });
 
-    return db.albums[albumIndex];
+    return await this.albumRepository.findOneBy({ id });
   }
 
-  deleteAlbum(id: string) {
+  async deleteAlbum(id: string) {
     if (!isValidUUID(id)) {
       throw new HttpException(`Id ${id} not valid`, HttpStatus.BAD_REQUEST);
     }
-    const albumIndex = db.albums.findIndex((album) => album.id === id);
-    if (albumIndex === -1) {
+    const album = await this.albumRepository.findOneBy({ id });
+    if (!album) {
       throw new HttpException(`Album ${id} not found`, HttpStatus.NOT_FOUND);
     }
 
+    /*
     const albumTrack: ITrack = db.tracks.find(
       (track: ITrack) => track.albumId === id,
     );
@@ -77,6 +81,7 @@ export class AlbumsService {
     }
 
     const deletedAlbum = db.albums.splice(albumIndex, 1);
-    return deletedAlbum;
+    */
+    return await this.albumRepository.delete({ id });
   }
 }
