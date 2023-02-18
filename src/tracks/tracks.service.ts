@@ -1,20 +1,28 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
 import { db } from 'src/db';
+import { Repository } from 'typeorm';
 import { v4 as uuidv4 } from 'uuid';
 import { validate as isValidUUID } from 'uuid';
 import { CreateTrackDto } from './dto/create-track.dto';
+import { TrackEntity } from './entity/tracks.entity';
 
 @Injectable()
 export class TracksService {
-  getAll() {
-    return db.tracks;
+  constructor(
+    @InjectRepository(TrackEntity)
+    private trackRepository: Repository<TrackEntity>,
+  ) {}
+
+  async getAll() {
+    return await this.trackRepository.find();
   }
 
-  getById(id: string) {
+  async getById(id: string) {
     if (!isValidUUID(id)) {
       throw new HttpException(`Id ${id} not valid`, HttpStatus.BAD_REQUEST);
     }
-    const track = db.tracks.find((track) => track.id === id);
+    const track = await this.trackRepository.findOneBy({ id });
     if (!track) {
       throw new HttpException(`Track ${id} not found`, HttpStatus.NOT_FOUND);
     } else {
@@ -22,48 +30,46 @@ export class TracksService {
     }
   }
 
-  createTrack(trackDto: CreateTrackDto) {
+  async createTrack(trackDto: CreateTrackDto) {
     const track = {
-      id: uuidv4(),
       ...trackDto,
     };
 
-    db.tracks.push(track);
-    return track;
+    const createTrack = await this.trackRepository.create(track);
+    return await this.trackRepository.save(createTrack);
   }
 
-  updateTrack(trackDto: CreateTrackDto, id: string) {
+  async updateTrack(trackDto: CreateTrackDto, id: string) {
     if (!isValidUUID(id)) {
       throw new HttpException(`Id ${id} not valid`, HttpStatus.BAD_REQUEST);
     }
 
-    const track = db.tracks.find((track) => track.id === id);
+    const track = await this.trackRepository.findOneBy({ id });
     if (!track) {
       throw new HttpException(`Track ${id} not found`, HttpStatus.NOT_FOUND);
     }
 
-    const trackIndex = db.tracks.findIndex((track) => track.id === id);
-    db.tracks[trackIndex] = {
+    await this.trackRepository.update(id, {
       id: track.id,
       ...trackDto,
-    };
+    });
 
-    return db.tracks[trackIndex];
+    return await this.trackRepository.findOneBy({ id });
   }
 
-  deleteTrack(id: string) {
+  async deleteTrack(id: string) {
     if (!isValidUUID(id)) {
       throw new HttpException(`Id ${id} not valid`, HttpStatus.BAD_REQUEST);
     }
 
-    const trackIndex = db.tracks.findIndex((user) => user.id === id);
-    if (trackIndex === -1) {
+    const track = await this.trackRepository.findOneBy({ id });
+    if (!track) {
       throw new HttpException(`Track ${id} not found`, HttpStatus.NOT_FOUND);
     }
-
+    /*
     db.favorites.tracks = db.favorites.tracks.filter((track) => track !== id);
     const deletedTrack = db.tracks.splice(trackIndex, 1);
-
-    return deletedTrack;
+    */
+    return await this.trackRepository.delete({ id });
   }
 }
