@@ -8,7 +8,7 @@
   "scripts": {
     "docker:start": "docker-compose up",
     "docker:build": "docker-compose up --build",
-    "docker:scan": "docker scan home-library && postgres-database",
+    "docker:scan": "docker scan makrakvladislav/home-library:app && makrakvladislav/postgres-db:db",
     "prebuild": "rimraf dist",
     "build": "nest build",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
