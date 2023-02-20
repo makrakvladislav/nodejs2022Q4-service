@@ -1,7 +1,7 @@
 import { IArtist } from 'src/interfaces/IArtist';
 import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 
-@Entity('artist')
+@Entity({ name: 'artist' })
 export class ArtistEntity implements IArtist {
   @PrimaryGeneratedColumn('uuid')
   id: string;

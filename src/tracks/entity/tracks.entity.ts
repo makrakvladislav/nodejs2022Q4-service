@@ -9,7 +9,7 @@ import {
   PrimaryGeneratedColumn,
 } from 'typeorm';
 
-@Entity('track')
+@Entity({ name: 'track' })
 export class TrackEntity implements ITrack {
   @PrimaryGeneratedColumn('uuid')
   id: string;

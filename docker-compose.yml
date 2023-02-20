@@ -30,6 +30,8 @@ services:
     restart: on-failure
     volumes:
       - db:/var/lib/postgresql/data
+    command:
+      ['postgres', '-c', 'logging_collector=true', '-c', 'log_statement=all']
     networks:
       - home-library-bridge
 

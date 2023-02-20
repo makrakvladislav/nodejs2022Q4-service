@@ -3,8 +3,8 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { validate as isValidUUID } from 'uuid';
 import { UpdatePasswordDto } from './dto/update-user.dto';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
 import { UserEntity } from './entity/user.entity';
+import { Repository } from 'typeorm/repository/Repository';
 
 @Injectable()
 export class UsersService {

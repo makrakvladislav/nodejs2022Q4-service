@@ -8,7 +8,7 @@ import {
   PrimaryGeneratedColumn,
 } from 'typeorm';
 
-@Entity('album')
+@Entity({ name: 'album' })
 export class AlbumEntity implements IAlbum {
   @ManyToOne(() => ArtistEntity, (artist) => artist.id, {
     onDelete: 'SET NULL',

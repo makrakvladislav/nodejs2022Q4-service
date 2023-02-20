@@ -1,8 +1,6 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { db } from 'src/db';
-import { Repository } from 'typeorm';
-import { v4 as uuidv4 } from 'uuid';
+import { Repository } from 'typeorm/repository/Repository';
 import { validate as isValidUUID } from 'uuid';
 import { CreateTrackDto } from './dto/create-track.dto';
 import { TrackEntity } from './entity/tracks.entity';

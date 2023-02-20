@@ -1,7 +1,13 @@
-import 'dotenv/config';
-import { DataSourceOptions } from 'typeorm';
+import { DataSource, DataSourceOptions } from 'typeorm';
+import { AlbumEntity } from './albums/entity/albums.entity';
+import { ArtistEntity } from './artists/entity/artists.entity';
+import { FavoritesEntity } from './favorites/entity/favorites.entity';
+import { TrackEntity } from './tracks/entity/tracks.entity';
+import { UserEntity } from './users/entity/user.entity';
+import * as dotenv from 'dotenv';
+dotenv.config();
 
-export default {
+export const configService = {
   type: 'postgres',
   host: process.env.POSTGRES_HOST,
   port: parseInt(process.env.POSTGRES_PORT),
@@ -14,3 +20,5 @@ export default {
   entities: [__dirname + '/**/**/*.entity.{ts,js}'],
   migrations: [__dirname + './migration/*.{ts,js}'],
 } as DataSourceOptions;
+
+export default new DataSource(configService);
