@@ -1,0 +1,44 @@
+version: '3.8'
+
+services:
+  home-library-api:
+    image: makrakvladislav/home-library:app
+    build: .
+    ports:
+      - ${PORT}:${PORT}
+    env_file: .env
+    depends_on:
+      - db
+    environment:
+      - POSTGRES_HOST=db
+    volumes:
+      - ./src:/usr/app/src
+    restart: on-failure
+    networks:
+      - home-library-bridge
+
+  db:
+    image: makrakvladislav/postgres-db:db
+    build: ./db
+    ports:
+      - '$POSTGRES_PORT:$POSTGRES_PORT'
+    env_file: .env
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    restart: on-failure
+    volumes:
+      - db:/var/lib/postgresql/data
+    command:
+      ['postgres', '-c', 'logging_collector=true', '-c', 'log_statement=all']
+    networks:
+      - home-library-bridge
+
+networks:
+  home-library-bridge:
+    driver: bridge
+
+volumes:
+  home-library-api:
+  db:
