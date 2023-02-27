@@ -5,6 +5,8 @@ import { UpdatePasswordDto } from './dto/update-user.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { UserEntity } from './entity/user.entity';
 import { Repository } from 'typeorm/repository/Repository';
+import * as bcrypt from 'bcrypt';
+import 'dotenv/config';
 
 @Injectable()
 export class UsersService {
@@ -15,7 +17,12 @@ export class UsersService {
 
   async getAll() {
     const users = await this.userRepository.find();
-    return users.map((user) => user.toResponse());
+    return users;
+  }
+
+  async getByLogin(login: string) {
+    const user = await this.userRepository.findOneBy({ login });
+    return user;
   }
 
   async getById(id: string) {
@@ -31,14 +38,19 @@ export class UsersService {
   }
 
   async createUser(userDto: CreateUserDto) {
+    const hashPass = await bcrypt.hash(
+      userDto.password,
+      Number(process.env.CRYPT_SALT),
+    );
     const user = {
       ...userDto,
+      password: hashPass,
       version: 1,
       createdAt: Date.now(),
       updatedAt: Date.now(),
     };
     const createUser = await this.userRepository.create(user);
-    return await (await this.userRepository.save(createUser)).toResponse();
+    return await await this.userRepository.save(createUser);
   }
 
   async updateUser(userDto: UpdatePasswordDto, id: string) {
@@ -51,7 +63,8 @@ export class UsersService {
       throw new HttpException(`User ${id} not found`, HttpStatus.NOT_FOUND);
     }
 
-    if (user.password !== userDto.oldPassword) {
+    const passCheck = await bcrypt.compare(userDto.oldPassword, user.password);
+    if (!passCheck) {
       throw new HttpException(
         `Old password ${userDto.oldPassword} is wrong`,
         HttpStatus.FORBIDDEN,

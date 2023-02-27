@@ -23,10 +23,12 @@ export class UserEntity {
   @Column({ type: 'int8' })
   updatedAt: number;
 
+  /*
   toResponse() {
     const { id, login, version, createdAt, updatedAt } = this;
     return { id, login, version, createdAt, updatedAt };
   }
+  */
 
   constructor(partial: Partial<IUser>) {
     Object.assign(this, partial);
